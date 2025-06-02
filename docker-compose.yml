@@ -1,0 +1,10 @@
+services:
+  db:
+    build: .
+    container_name: postgres-proyecto4-bd
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: peluzoo
+    ports:
+      - "5430:5432"
