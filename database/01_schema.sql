@@ -175,7 +175,7 @@ CREATE TYPE categoria_producto_enum AS ENUM (
 
 
 -- ================================================================
--- 2. TABLAS PRINCIPALES (REORDENADAS PARA DEPENDENCIAS)
+-- 2. TABLAS PRINCIPALES
 -- ================================================================
 
 -- 2.1. Tabla: especies
@@ -191,9 +191,7 @@ CREATE TABLE especies (
     genero                  TEXT,
     estado_conservacion     estado_conservacion_enum,
     esperanza_vida          INTEGER,              -- en años
-    peso_promedio           DECIMAL(5,2),         -- en kg (promedio)
-    created_at              TIMESTAMP   NOT NULL DEFAULT NOW(),
-    updated_at              TIMESTAMP   NOT NULL DEFAULT NOW()
+    peso_promedio           DECIMAL(5,2)          -- en kg (promedio)
 );
 
 -- 2.2. Tabla: tipos_habitat
@@ -204,9 +202,7 @@ CREATE TABLE tipos_habitat (
     temperatura_min         DECIMAL(5,2),         -- en °C
     temperatura_max         DECIMAL(5,2),         -- en °C
     humedad_min             DECIMAL(5,2),         -- en %
-    humedad_max             DECIMAL(5,2),         -- en %
-    created_at              TIMESTAMP   NOT NULL DEFAULT NOW(),
-    updated_at              TIMESTAMP   NOT NULL DEFAULT NOW()
+    humedad_max             DECIMAL(5,2)          -- en %
 );
 
 -- 2.3. Tabla: habitats
@@ -222,9 +218,7 @@ CREATE TABLE habitats (
     area_metros_cuadrados   DECIMAL(8,2) NOT NULL CHECK (area_metros_cuadrados > 0),
     fecha_construccion      DATE,
     estado                  estado_habitat_enum    NOT NULL,
-    costo_mantenimiento_mensual DECIMAL(10,2) NOT NULL CHECK (costo_mantenimiento_mensual >= 0),
-    created_at              TIMESTAMP   NOT NULL DEFAULT NOW(),
-    updated_at              TIMESTAMP   NOT NULL DEFAULT NOW()
+    costo_mantenimiento_mensual DECIMAL(10,2) NOT NULL CHECK (costo_mantenimiento_mensual >= 0)
 );
 
 -- 2.4. Tabla: empleados
@@ -242,9 +236,7 @@ CREATE TABLE empleados (
     fecha_contratacion      DATE,
     salario                 DECIMAL(12,2) NOT NULL CHECK (salario >= 0),
     tipo_empleado           tipo_empleado_enum    NOT NULL,
-    activo                  BOOLEAN NOT NULL DEFAULT TRUE,
-    created_at              TIMESTAMP   NOT NULL DEFAULT NOW(),
-    updated_at              TIMESTAMP   NOT NULL DEFAULT NOW()
+    activo                  BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 -- 2.5. Tabla: departamentos
@@ -256,9 +248,7 @@ CREATE TABLE departamentos (
     jefe_departamento_id    INTEGER
         REFERENCES empleados(id_empleado)
         ON UPDATE CASCADE
-        ON DELETE SET NULL,
-    created_at              TIMESTAMP   NOT NULL DEFAULT NOW(),
-    updated_at              TIMESTAMP   NOT NULL DEFAULT NOW()
+        ON DELETE SET NULL
 );
 
 -- 2.6. Ahora que existe departamentos, agregamos la FK en empleados
@@ -278,9 +268,7 @@ CREATE TABLE cuidadores (
     especialidad            TEXT,
     años_experiencia        INTEGER CHECK (años_experiencia >= 0),
     certificaciones         TEXT,
-    nivel_autoridad         INTEGER NOT NULL CHECK (nivel_autoridad BETWEEN 1 AND 5),
-    created_at              TIMESTAMP   NOT NULL DEFAULT NOW(),
-    updated_at              TIMESTAMP   NOT NULL DEFAULT NOW()
+    nivel_autoridad         INTEGER NOT NULL CHECK (nivel_autoridad BETWEEN 1 AND 5)
 );
 
 -- 2.8. Tabla: veterinarios (hereda de empleados)
@@ -292,9 +280,7 @@ CREATE TABLE veterinarios (
     numero_colegiado        TEXT    NOT NULL UNIQUE,
     especialidad_veterinaria TEXT,
     universidad_titulo      TEXT,
-    años_experiencia        INTEGER CHECK (años_experiencia >= 0),
-    created_at              TIMESTAMP   NOT NULL DEFAULT NOW(),
-    updated_at              TIMESTAMP   NOT NULL DEFAULT NOW()
+    años_experiencia        INTEGER CHECK (años_experiencia >= 0)
 );
 
 -- 2.9. Tabla: animales
@@ -315,9 +301,7 @@ CREATE TABLE animales (
     altura                  DECIMAL(5,2),
     numero_identificacion   TEXT    UNIQUE NOT NULL,
     origen                  origen_animal_enum  NOT NULL,
-    estado_salud            estado_salud_enum   NOT NULL,
-    created_at              TIMESTAMP   NOT NULL DEFAULT NOW(),
-    updated_at              TIMESTAMP   NOT NULL DEFAULT NOW()
+    estado_salud            estado_salud_enum   NOT NULL
 );
 
 -- 2.10. Tabla: visitantes
@@ -329,9 +313,7 @@ CREATE TABLE visitantes (
     telefono                TEXT,
     fecha_nacimiento        DATE,
     nacionalidad            TEXT,
-    tipo_visitante          tipo_visitante_enum NOT NULL,
-    created_at              TIMESTAMP   NOT NULL DEFAULT NOW(),
-    updated_at              TIMESTAMP   NOT NULL DEFAULT NOW()
+    tipo_visitante          tipo_visitante_enum NOT NULL
 );
 
 -- 2.11. Tabla: proveedores
@@ -344,9 +326,7 @@ CREATE TABLE proveedores (
     direccion               TEXT,
     tipo_proveedor          tipo_proveedor_enum NOT NULL,
     calificacion            INTEGER NOT NULL CHECK (calificacion BETWEEN 1 AND 5),
-    activo                  BOOLEAN NOT NULL DEFAULT TRUE,
-    created_at              TIMESTAMP   NOT NULL DEFAULT NOW(),
-    updated_at              TIMESTAMP   NOT NULL DEFAULT NOW()
+    activo                  BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 -- 2.12. Tabla: alimentos
@@ -366,9 +346,7 @@ CREATE TABLE alimentos (
     costo_por_kg            DECIMAL(10,2) NOT NULL CHECK (costo_por_kg >= 0),
     fecha_vencimiento       DATE,
     stock_actual            INTEGER NOT NULL CHECK (stock_actual >= 0),
-    stock_minimo            INTEGER NOT NULL CHECK (stock_minimo >= 0),
-    created_at              TIMESTAMP   NOT NULL DEFAULT NOW(),
-    updated_at              TIMESTAMP   NOT NULL DEFAULT NOW()
+    stock_minimo            INTEGER NOT NULL CHECK (stock_minimo >= 0)
 );
 
 -- 2.13. Tabla: tratamientos_medicos
@@ -379,9 +357,7 @@ CREATE TABLE tratamientos_medicos (
     costo_base              DECIMAL(12,2) NOT NULL CHECK (costo_base >= 0),
     duracion_estimada_dias  INTEGER NOT NULL CHECK (duracion_estimada_dias >= 0),
     tipo_tratamiento        tipo_tratamiento_enum NOT NULL,
-    requiere_sedacion       BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at              TIMESTAMP   NOT NULL DEFAULT NOW(),
-    updated_at              TIMESTAMP   NOT NULL DEFAULT NOW()
+    requiere_sedacion       BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 -- 2.14. Tabla: eventos
@@ -397,9 +373,7 @@ CREATE TABLE eventos (
     precio_entrada          DECIMAL(8,2) NOT NULL CHECK (precio_entrada >= 0),
     tipo_evento             tipo_evento_enum   NOT NULL,
     estado                  estado_evento_enum NOT NULL,
-    horario_complejo        horario_evento,        -- tipo compuesto (opcional)
-    created_at              TIMESTAMP   NOT NULL DEFAULT NOW(),
-    updated_at              TIMESTAMP   NOT NULL DEFAULT NOW()
+    horario_complejo        horario_evento
 );
 
 -- 2.15. Tabla: productos
@@ -415,9 +389,7 @@ CREATE TABLE productos (
         REFERENCES proveedores(id_proveedor)
         ON UPDATE CASCADE
         ON DELETE RESTRICT,
-    activo                  BOOLEAN NOT NULL DEFAULT TRUE,
-    created_at              TIMESTAMP   NOT NULL DEFAULT NOW(),
-    updated_at              TIMESTAMP   NOT NULL DEFAULT NOW()
+    activo                  BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 -- 2.16. Tabla: horarios
@@ -435,9 +407,7 @@ CREATE TABLE horarios (
     id_evento               INTEGER
         REFERENCES eventos(id_evento)
         ON UPDATE CASCADE
-        ON DELETE SET NULL,
-    created_at              TIMESTAMP   NOT NULL DEFAULT NOW(),
-    updated_at              TIMESTAMP   NOT NULL DEFAULT NOW()
+        ON DELETE SET NULL
 );
 
 
@@ -459,8 +429,6 @@ CREATE TABLE animal_cuidador (
     fecha_asignacion        DATE    NOT NULL,
     es_cuidador_principal   BOOLEAN NOT NULL DEFAULT FALSE,
     notas                   TEXT,
-    created_at              TIMESTAMP   NOT NULL DEFAULT NOW(),
-    updated_at              TIMESTAMP   NOT NULL DEFAULT NOW(),
     UNIQUE (id_animal, id_cuidador, fecha_asignacion)
 );
 
@@ -482,9 +450,7 @@ CREATE TABLE animal_alimentacion (
     fecha_alimentacion      DATE    NOT NULL,
     hora_alimentacion       TIME,
     cantidad_kg             DECIMAL(8,2) NOT NULL CHECK (cantidad_kg > 0),
-    observaciones           TEXT,
-    created_at              TIMESTAMP   NOT NULL DEFAULT NOW(),
-    updated_at              TIMESTAMP   NOT NULL DEFAULT NOW()
+    observaciones           TEXT
 );
 
 -- 3.3. visitante_evento (visitantes ↔ eventos)
@@ -503,8 +469,6 @@ CREATE TABLE visitante_evento (
     asistio                 BOOLEAN NOT NULL DEFAULT FALSE,
     calificacion            INTEGER CHECK (calificacion BETWEEN 1 AND 5),
     comentarios             TEXT,
-    created_at              TIMESTAMP   NOT NULL DEFAULT NOW(),
-    updated_at              TIMESTAMP   NOT NULL DEFAULT NOW(),
     UNIQUE (id_visitante, id_evento)
 );
 
@@ -524,9 +488,7 @@ CREATE TABLE habitat_mantenimiento (
     descripcion_trabajo     TEXT,
     costo                   DECIMAL(10,2) NOT NULL CHECK (costo >= 0),
     tiempo_horas            DECIMAL(5,2) NOT NULL CHECK (tiempo_horas >= 0),
-    completado              BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at              TIMESTAMP   NOT NULL DEFAULT NOW(),
-    updated_at              TIMESTAMP   NOT NULL DEFAULT NOW()
+    completado              BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 -- 3.5. venta_productos (visitantes ↔ productos)
@@ -544,8 +506,6 @@ CREATE TABLE venta_productos (
     precio_unitario         DECIMAL(10,2) NOT NULL CHECK (precio_unitario >= 0),
     fecha_venta             TIMESTAMP   NOT NULL DEFAULT NOW(),
     metodo_pago             metodo_pago_enum    NOT NULL,
-    descuento_aplicado      DECIMAL(5,2) CHECK (descuento_aplicado >= 0),
-    created_at              TIMESTAMP   NOT NULL DEFAULT NOW(),
-    updated_at              TIMESTAMP   NOT NULL DEFAULT NOW()
+    descuento_aplicado      DECIMAL(5,2) CHECK (descuento_aplicado >= 0)
 );
 
