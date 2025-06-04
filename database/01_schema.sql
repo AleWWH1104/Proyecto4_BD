@@ -191,7 +191,8 @@ CREATE TABLE especies (
     genero                  TEXT,
     estado_conservacion     estado_conservacion_enum,
     esperanza_vida          INTEGER,              -- en años
-    peso_promedio           DECIMAL(5,2)          -- en kg (promedio)
+    -- CAMBIAR ESTA LÍNEA:
+    peso_promedio           DECIMAL(8,2)          -- en kg (promedio)
 );
 
 -- 2.2. Tabla: tipos_habitat
@@ -389,7 +390,9 @@ CREATE TABLE productos (
         REFERENCES proveedores(id_proveedor)
         ON UPDATE CASCADE
         ON DELETE RESTRICT,
-    activo                  BOOLEAN NOT NULL DEFAULT TRUE
+    activo                  BOOLEAN NOT NULL DEFAULT TRUE,
+    -- NUEVA LÍNEA:
+    updated_at              TIMESTAMP WITH TIME ZONE DEFAULT NOW() -- O TIMESTAMP SIN TZ si prefieres
 );
 
 -- 2.16. Tabla: horarios
