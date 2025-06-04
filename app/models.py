@@ -1,10 +1,10 @@
 # app/models.py
-from sqlalchemy import Column, Integer, String, Date, DECIMAL, Boolean, Time, ForeignKey, Text
-from sqlalchemy.dialects.postgresql import ENUM, JSONB
+from sqlalchemy import JSON, Column, Integer, String, Date, DECIMAL, Boolean, Time, ForeignKey, Text
+from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import relationship
-from database import Base
+from database import Base, CoordenadasType, HorarioEventoType  # Importar CoordenadasType
 
-# Definición de ENUMS (deben coincidir con los de tu esquema SQL)
+# ... (tus definiciones de ENUMS existentes) ...
 EstadoConservacionEnum = ENUM(
     'extinto', 'extinto_naturaleza', 'peligro_critico', 'peligro',
     'vulnerable', 'casi_amenazado', 'preocupacion_menor',
@@ -36,6 +36,8 @@ EstadoEventoEnum = ENUM(
 )
 
 # Modelos
+# ... (Especie y TipoHabitat sin cambios) ...
+
 class Especie(Base):
     __tablename__ = 'especies'
     id_especie = Column(Integer, primary_key=True)
@@ -72,14 +74,13 @@ class TipoHabitat(Base):
     def __repr__(self):
         return f"<TipoHabitat(nombre='{self.nombre}')>"
 
-
 class Habitat(Base):
     __tablename__ = 'habitats'
     id_habitat = Column(Integer, primary_key=True)
     nombre = Column(Text, nullable=False)
     id_tipo_habitat = Column(Integer, ForeignKey('tipos_habitat.id_tipo_habitat'), nullable=False)
-    # ubicacion se trata como JSONB para los tipos compuestos
-    ubicacion = Column(JSONB)
+    # Ubicación usa el tipo de dato personalizado CoordenadasType
+    ubicacion = Column(CoordenadasType) 
     capacidad_maxima = Column(Integer, nullable=False)
     area_metros_cuadrados = Column(DECIMAL(8, 2), nullable=False)
     fecha_construccion = Column(Date)
@@ -92,6 +93,7 @@ class Habitat(Base):
     def __repr__(self):
         return f"<Habitat(nombre='{self.nombre}', estado='{self.estado}')>"
 
+# ... (resto de tus modelos Animal y Evento sin cambios, ya que no usan tipos compuestos que causen este error) ...
 
 class Animal(Base):
     __tablename__ = 'animales'
@@ -127,8 +129,8 @@ class Evento(Base):
     precio_entrada = Column(DECIMAL(8, 2), nullable=False)
     tipo_evento = Column(TipoEventoEnum, nullable=False)
     estado = Column(EstadoEventoEnum, nullable=False)
-    # horario_complejo se trata como JSONB para los tipos compuestos
-    horario_complejo = Column(JSONB)
+    # ¡Usa el nuevo tipo de dato personalizado!
+    horario_complejo = Column(HorarioEventoType) 
 
     def __repr__(self):
         return f"<Evento(nombre='{self.nombre}', fecha_inicio='{self.fecha_inicio}')>"

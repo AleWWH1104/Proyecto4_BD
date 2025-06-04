@@ -5,10 +5,6 @@ from crud import crud
 from datetime import date, time
 
 def create_tables():
-    """Crea las tablas en la base de datos.
-    Solo se debe llamar una vez o cuando se realicen cambios en los modelos
-    y se necesite recrear el esquema.
-    """
     print("Creando tablas en la base de datos...")
     Base.metadata.create_all(bind=engine)
     print("Tablas creadas exitosamente.")
@@ -16,8 +12,9 @@ def create_tables():
 def main():
     print("Iniciando pruebas CRUD...")
 
+    # create_tables() # Comenta esta línea si ya tienes el esquema cargado por Docker
 
-    db = next(get_db()) # Obtiene una sesión de base de datos
+    db = next(get_db())
 
     try:
         # --- Pruebas para Especies y Tipos de Hábitat (necesarias para Animales y Habitats) ---
@@ -99,22 +96,31 @@ def main():
         # --- Pruebas CRUD para Animales ---
         print("\n--- Pruebas CRUD para Animales ---")
 
-        # 1. Crear Animal
+        # 1. Crear Animal (o obtener si ya existe)
         print("\n--- Crear Animal ---")
-        animal_data = {
-            "nombre": "Simba",
-            "id_especie": especie_leon.id_especie,
-            "id_habitat": nuevo_habitat.id_habitat,
-            "fecha_nacimiento": date(2021, 5, 10),
-            "sexo": "M",
-            "peso_actual": 180.5,
-            "altura": 1.2,
-            "numero_identificacion": "LEO-001",
-            "origen": "nacido_zoologico",
-            "estado_salud": "excelente"
-        }
-        nuevo_animal = crud.create_animal(db, animal_data)
-        print(f"Animal creado: {nuevo_animal}")
+        animal_numero_identificacion = "LEO-001" # Define el número de identificación
+        
+        # Primero, intenta buscar el animal por su número de identificación
+        existente_animal = db.query(Animal).filter_by(numero_identificacion=animal_numero_identificacion).first()
+
+        if existente_animal:
+            nuevo_animal = existente_animal
+            print(f"Animal '{animal_numero_identificacion}' ya existe: {nuevo_animal}")
+        else:
+            animal_data = {
+                "nombre": "Simba",
+                "id_especie": especie_leon.id_especie,
+                "id_habitat": nuevo_habitat.id_habitat,
+                "fecha_nacimiento": date(2021, 5, 10),
+                "sexo": "M",
+                "peso_actual": 180.5,
+                "altura": 1.2,
+                "numero_identificacion": animal_numero_identificacion, # Usa la variable
+                "origen": "nacido_zoologico",
+                "estado_salud": "excelente"
+            }
+            nuevo_animal = crud.create_animal(db, animal_data)
+            print(f"Animal creado: {nuevo_animal}")
 
         # 2. Leer Animal por ID
         print("\n--- Leer Animal ---")
@@ -150,9 +156,10 @@ def main():
             "precio_entrada": 5.00,
             "tipo_evento": "educativo",
             "estado": "programado",
+            # Asegúrate que el formato de 'hora_inicio' y 'hora_fin' aquí sea de cadena para el TypeDecorator
             "horario_complejo": {
                 "dias_semana": [4], # Jueves
-                "hora_inicio": "10:00:00",
+                "hora_inicio": "10:00:00", 
                 "hora_fin": "11:00:00",
                 "duracion_minutos": 60,
                 "frecuencia": "semanal"
@@ -180,12 +187,10 @@ def main():
 
         # --- Eliminar (opcional, para limpiar) ---
         print("\n--- Limpiando datos (Eliminando) ---")
-        # Asegúrate de eliminar en el orden correcto si hay dependencias de FK
-        # Por ejemplo, elimina animales antes de eliminar hábitats si hay FK ON DELETE RESTRICT
-        # delete_animal(db, nuevo_animal.id_animal)
-        # delete_evento(db, nuevo_evento.id_evento)
-        # delete_habitat(db, nuevo_habitat.id_habitat)
-        # print("Registros eliminados.")
+        #delete_animal(db, nuevo_animal.id_animal)
+        #delete_evento(db, nuevo_evento.id_evento)
+        #delete_habitat(db, nuevo_habitat.id_habitat)
+        #print("Registros eliminados.")
 
     except Exception as e:
         print(f"Ocurrió un error durante las pruebas: {e}")
