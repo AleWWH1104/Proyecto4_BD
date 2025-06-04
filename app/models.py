@@ -4,7 +4,6 @@ from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import relationship
 from database import Base, CoordenadasType, HorarioEventoType  # Importar CoordenadasType
 
-# ... (tus definiciones de ENUMS existentes) ...
 EstadoConservacionEnum = ENUM(
     'extinto', 'extinto_naturaleza', 'peligro_critico', 'peligro',
     'vulnerable', 'casi_amenazado', 'preocupacion_menor',
@@ -93,8 +92,6 @@ class Habitat(Base):
     def __repr__(self):
         return f"<Habitat(nombre='{self.nombre}', estado='{self.estado}')>"
 
-# ... (resto de tus modelos Animal y Evento sin cambios, ya que no usan tipos compuestos que causen este error) ...
-
 class Animal(Base):
     __tablename__ = 'animales'
     id_animal = Column(Integer, primary_key=True)
@@ -134,3 +131,70 @@ class Evento(Base):
 
     def __repr__(self):
         return f"<Evento(nombre='{self.nombre}', fecha_inicio='{self.fecha_inicio}')>"
+    
+    # --- NUEVOS MODELOS PARA VISTAS ---
+
+class VistaFinancieraMensual(Base):
+    __tablename__ = 'vista_financiera_mensual'
+    # Las vistas no suelen tener una PK explícita para SQLAlchemy
+    # Pero puedes usar 'mes' como un identificador único si lo deseas para consulta
+    mes = Column(Text, primary_key=True) # Usamos mes como PK para poder filtrar y ordenar
+    ingresos_eventos = Column(DECIMAL(10, 2))
+    ingresos_ventas = Column(DECIMAL(10, 2))
+    costos_mantenimiento = Column(DECIMAL(10, 2))
+    gastos_tratamientos = Column(DECIMAL(10, 2))
+    costos_alimentos = Column(DECIMAL(10, 2))
+    costos_salarios = Column(DECIMAL(10, 2))
+    ingresos_totales = Column(DECIMAL(10, 2))
+    gastos_totales = Column(DECIMAL(10, 2))
+    balance_mensual = Column(DECIMAL(10, 2))
+
+    def __repr__(self):
+        return (f"<VistaFinancieraMensual(mes='{self.mes}', "
+                f"ingresos_totales={self.ingresos_totales}, "
+                f"gastos_totales={self.gastos_totales}, "
+                f"balance_mensual={self.balance_mensual})>")
+
+
+class VistaConservacion(Base):
+    __tablename__ = 'vista_conservacion'
+    # id_especie es una buena candidata para PK aquí
+    id_especie = Column(Integer, primary_key=True) 
+    nombre_cientifico = Column(Text)
+    nombre_comun = Column(Text)
+    estado_conservacion = Column(EstadoConservacionEnum)
+    cantidad_en_zoo = Column(Integer)
+    esperanza_vida = Column(Integer)
+    habitat_principal = Column(Text)
+    rango_temperatura = Column(Text) # Almacenado como texto en la vista
+    rango_humedad = Column(Text)     # Almacenado como texto en la vista
+    cuidadores_asignados = Column(Integer)
+    veterinarios_especializados = Column(Integer)
+
+    def __repr__(self):
+        return (f"<VistaConservacion(nombre_comun='{self.nombre_comun}', "
+                f"estado_conservacion='{self.estado_conservacion}', "
+                f"cantidad_en_zoo={self.cantidad_en_zoo})>")
+
+
+class VistaControlAnimal(Base):
+    __tablename__ = 'vista_control_animal'
+    # id_animal es una buena candidata para PK aquí
+    id_animal = Column(Integer, primary_key=True)
+    nombre_animal = Column(Text)
+    especie = Column(Text)
+    estado_conservacion = Column(EstadoConservacionEnum)
+    habitat = Column(Text)
+    tipo_habitat = Column(Text)
+    estado_salud = Column(EstadoSaludEnum)
+    peso_actual = Column(DECIMAL(8, 2))
+    fecha_nacimiento = Column(Date)
+    edad_aproximada = Column(Integer)
+    cuidador_principal = Column(Text)
+    total_cuidadores_asignados = Column(Integer)
+    ultima_alimentacion_fecha = Column(Date)
+    total_alimento_kg = Column(DECIMAL(10, 2)) # Ajusta la precisión si es necesario
+
+    def __repr__(self):
+        return (f"<VistaControlAnimal(nombre_animal='{self.nombre_animal}', "
+                f"especie='{self.especie}', estado_salud='{self.estado_salud}')>")
