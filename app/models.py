@@ -1,5 +1,5 @@
 # app/models.py
-from sqlalchemy import JSON, Column, Integer, String, Date, DECIMAL, Boolean, Time, ForeignKey, Text
+from sqlalchemy import JSON, Column, DateTime, Integer, String, Date, DECIMAL, Boolean, Time, ForeignKey, Text, func
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import relationship
 from database import Base, CoordenadasType, HorarioEventoType  # Importar CoordenadasType
@@ -198,3 +198,64 @@ class VistaControlAnimal(Base):
     def __repr__(self):
         return (f"<VistaControlAnimal(nombre_animal='{self.nombre_animal}', "
                 f"especie='{self.especie}', estado_salud='{self.estado_salud}')>")
+    
+    # Nuevos tipos ENUM
+TipoVisitanteEnum = ENUM(
+    'adulto', 'niño', 'estudiante', 'adulto_mayor',
+    name='tipo_visitante_enum', create_type=False
+)
+TipoProveedorEnum = ENUM(
+    'alimentos', 'medicamentos', 'equipos', 'construccion',
+    name='tipo_proveedor_enum', create_type=False
+)
+TipoAlimentoEnum = ENUM(
+    'carnivoro', 'herbivoro', 'omnivoro', 'suplemento',
+    name='tipo_alimento_enum', create_type=False
+)
+MetodoPagoEnum = ENUM(
+    'efectivo', 'tarjeta', 'transferencia',
+    name='metodo_pago_enum', create_type=False
+)
+
+# Modelo para visitantes
+class Visitante(Base):
+    __tablename__ = 'visitantes'
+    id_visitante = Column(Integer, primary_key=True)
+    nombre = Column(Text, nullable=False)
+    apellido = Column(Text, nullable=False)
+    email = Column(Text, unique=True)
+    telefono = Column(Text)
+    fecha_nacimiento = Column(Date)
+    nacionalidad = Column(Text)
+    tipo_visitante = Column(TipoVisitanteEnum, nullable=False)
+    
+    eventos = relationship("VisitanteEvento", back_populates="visitante")
+
+# Modelo para relación visitante-evento
+class VisitanteEvento(Base):
+    __tablename__ = 'visitante_evento'
+    id = Column(Integer, primary_key=True)
+    id_visitante = Column(Integer, ForeignKey('visitantes.id_visitante'), nullable=False)
+    id_evento = Column(Integer, ForeignKey('eventos.id_evento'), nullable=False)
+    fecha_registro = Column(DateTime, nullable=False, default=func.now())
+    precio_pagado = Column(DECIMAL(8,2), nullable=False)
+    asistio = Column(Boolean, nullable=False, default=False)
+    
+    visitante = relationship("Visitante", back_populates="eventos")
+    evento = relationship("Evento", back_populates="asistentes")
+
+# Actualizar modelo Evento para relación
+Evento.asistentes = relationship("VisitanteEvento", back_populates="evento")
+
+# Modelo para alimentación animal
+class AnimalAlimentacion(Base):
+    __tablename__ = 'animal_alimentacion'
+    id = Column(Integer, primary_key=True)
+    id_animal = Column(Integer, ForeignKey('animales.id_animal'), nullable=False)
+    fecha_alimentacion = Column(Date, nullable=False)
+    cantidad_kg = Column(DECIMAL(8,2), nullable=False)
+    
+    animal = relationship("Animal", back_populates="alimentaciones")
+
+# Actualizar modelo Animal para relación
+Animal.alimentaciones = relationship("AnimalAlimentacion", back_populates="animal")
