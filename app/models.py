@@ -132,6 +132,60 @@ class Evento(Base):
     def __repr__(self):
         return f"<Evento(nombre='{self.nombre}', fecha_inicio='{self.fecha_inicio}')>"
     
+    # Añadir al final de models.py (antes de las vistas)
+
+# --- MODELOS PARA REPORTE DE VENTAS ---
+MetodoPagoEnum = ENUM(
+    'efectivo', 'tarjeta', 'transferencia',
+    name='metodo_pago_enum', create_type=False
+)
+
+class Producto(Base):
+    __tablename__ = 'productos'
+
+    id_producto = Column(Integer, primary_key=True)
+    nombre = Column(Text, nullable=False)
+    descripcion = Column(Text)
+    precio = Column(DECIMAL(10, 2), nullable=False)
+    stock_actual = Column(Integer, nullable=False)
+    stock_minimo = Column(Integer, nullable=False)
+    categoria = Column(Text)  # O usa ENUM si está definido
+    activo = Column(Boolean, default=True)
+    updated_at = Column(Date)
+
+    def __repr__(self):
+        return f"<Producto {self.nombre}>"
+
+class VentaProducto(Base):
+    __tablename__ = 'venta_productos'
+
+    id = Column(Integer, primary_key=True)
+    id_visitante = Column(Integer, ForeignKey('visitantes.id_visitante'))
+    id_producto = Column(Integer, ForeignKey('productos.id_producto'))
+    cantidad = Column(Integer, nullable=False)
+    precio_unitario = Column(DECIMAL(10, 2), nullable=False)
+    fecha_venta = Column(Date, nullable=False)
+    metodo_pago = Column(MetodoPagoEnum, nullable=False)
+    descuento_aplicado = Column(DECIMAL(5, 2))
+
+    producto = relationship("Producto")
+    visitante = relationship("Visitante")
+
+    def __repr__(self):
+        return f"<Venta {self.id}>"
+
+class Visitante(Base):
+    __tablename__ = 'visitantes'
+
+    id_visitante = Column(Integer, primary_key=True)
+    nombre = Column(Text, nullable=False)
+    apellido = Column(Text, nullable=False)
+    email = Column(Text)
+    telefono = Column(Text)
+
+    def __repr__(self):
+        return f"<Visitante {self.nombre} {self.apellido}>"
+    
     # --- NUEVOS MODELOS PARA VISTAS ---
 
 class VistaFinancieraMensual(Base):
