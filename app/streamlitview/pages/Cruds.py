@@ -70,12 +70,14 @@ try:
                 id_habitat = habitat_options.get(selected_habitat_name)
 
                 fecha_nacimiento = st.date_input("Fecha de Nacimiento", value=date.today(), key="animal_fnac_create")
-                sexo = st.selectbox("Sexo", ["M", "F", "Desconocido"], key="animal_sexo_create")
+                sexo = st.selectbox("Sexo", ["M", "F", "indefinido"], key="animal_sexo_create")
                 peso_actual = st.number_input("Peso Actual (kg)", min_value=0.0, format="%.2f", key="animal_peso_create")
                 altura = st.number_input("Altura (m)", min_value=0.0, format="%.2f", key="animal_altura_create")
                 numero_identificacion = st.text_input("Número de Identificación (único)", value=f"ANI-{uuid.uuid4().hex[:8].upper()}", key="animal_id_create")
-                origen = st.text_input("Origen", key="animal_origen_create")
-                estado_salud = st.text_input("Estado de Salud", key="animal_salud_create")
+                #origen = st.text_input("Origen", key="animal_origen_create")
+                origen = st.selectbox("Origen", ["nacido_zoologico", "rescate", "intercambio", "compra"],key="animal_origen_create")
+                #estado_salud = st.text_input("Estado de Salud", key="animal_salud_create")
+                estado_salud = st.selectbox("Estado de Salud", ["excelente", "bueno", "regular", "malo", "critico"],key="animal_salud_create")
 
                 submitted = st.form_submit_button("Crear Animal")
                 if submitted:
@@ -125,6 +127,8 @@ try:
                 st.info("No hay animales registrados.")
 
         elif operation == "Actualizar Animal":
+            ORIGEN_OPTIONS = ['nacido_zoologico', 'rescate', 'intercambio', 'compra']
+            ESTADO_SALUD_OPTIONS = ['excelente', 'bueno', 'regular', 'malo', 'critico']
             st.subheader("Actualizar Animal Existente")
             animals = crud.get_animals(db)
             if animals:
@@ -165,8 +169,14 @@ try:
                             new_sexo = st.selectbox("Nuevo Sexo", ["M", "F", "Desconocido"], index=["M", "F", "Desconocido"].index(animal_to_update.sexo) if animal_to_update.sexo in ["M", "F", "Desconocido"] else 0, key="animal_sexo_update")
                             new_peso_actual = st.number_input("Nuevo Peso Actual (kg)", value=float(animal_to_update.peso_actual), min_value=0.0, format="%.2f", key="animal_peso_update")
                             new_altura = st.number_input("Nueva Altura (m)", value=float(animal_to_update.altura), min_value=0.0, format="%.2f", key="animal_altura_update")
-                            new_origen = st.text_input("Nuevo Origen", value=animal_to_update.origen, key="animal_origen_update")
-                            new_estado_salud = st.text_input("Nuevo Estado de Salud", value=animal_to_update.estado_salud, key="animal_salud_update")
+                            
+                            # --- CHANGE 3: Use selectbox for 'new_origen' in update ---
+                            current_origen_index = ORIGEN_OPTIONS.index(animal_to_update.origen) if animal_to_update.origen in ORIGEN_OPTIONS else 0
+                            new_origen = st.selectbox("Nuevo Origen", ORIGEN_OPTIONS, index=current_origen_index, key="animal_origen_update")
+                            
+                            # --- CHANGE 4: Use selectbox for 'new_estado_salud' in update ---
+                            current_estado_salud_index = ESTADO_SALUD_OPTIONS.index(animal_to_update.estado_salud) if animal_to_update.estado_salud in ESTADO_SALUD_OPTIONS else 0
+                            new_estado_salud = st.selectbox("Nuevo Estado de Salud", ESTADO_SALUD_OPTIONS, index=current_estado_salud_index, key="animal_salud_update")
 
                             update_submitted = st.form_submit_button("Actualizar Animal")
                             if update_submitted:
