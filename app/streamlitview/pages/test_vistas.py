@@ -6,8 +6,8 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
 from database import get_db
-from export_to_dataframe import eventos_to_dataframe, habitats_to_dataframe, animals_to_dataframe
-from crud.crud import get_animals, get_eventos, get_habitats
+from export_to_dataframe import *
+from crud.crud import *
 
 import streamlit as st
 
@@ -16,17 +16,17 @@ def app():
 
     db = next(get_db())
     try:
-        a1 = animals_to_dataframe(db, get_animals(db))
-        a2 = eventos_to_dataframe(db, get_eventos(db))
-        a3 = habitats_to_dataframe(db, get_habitats(db))
+        a1 = vista_financiera_to_dataframe(db, get_vista_financiera_mensual(db))
+        a2 = vista_conservacion_to_dataframe(db, get_vista_conservacion(db))
+        a3 = vista_control_animal_to_dataframe(db, get_vista_control_animal(db))
 
-        st.subheader("DataFrame de Animales (a1)")
+        st.subheader("Vista Financiera (a1)")
         st.write(a1)
 
-        st.subheader("DataFrame de Eventos (a2)")
+        st.subheader("Vista Conservacion (a2)")
         st.write(a2)
 
-        st.subheader("DataFrame de Hábitats (a3)")
+        st.subheader("Vista Control Animal (a3)")
         st.write(a3)
 
     except Exception as e:
