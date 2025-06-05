@@ -1,3 +1,10 @@
+# app/streamlitview/home.py
+import sys
+import os
+
+# Añade el root del proyecto al path (sube 2 niveles desde este archivo)
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+
 import streamlit as st
 from database import get_db
 from models import Animal, Evento, Habitat, Especie, TipoHabitat # Make sure these models are correctly defined
@@ -24,7 +31,7 @@ st.title("🐯 Gestión de Zoológico - CRUD & Vistas")
 st.sidebar.title("Navegación")
 selection = st.sidebar.radio(
     "Selecciona una opción:",
-    ["Dashboard Principal", "Animales", "Hábitats", "Eventos", "Vistas de Datos"]
+    ["Dashboard Principal", "Animales", "Hábitats", "Eventos"]
 )
 
 db = next(get_db())
