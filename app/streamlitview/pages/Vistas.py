@@ -23,13 +23,13 @@ def app():
         a2 = vista_conservacion_to_dataframe(db, get_vista_conservacion(db))
         a3 = vista_control_animal_to_dataframe(db, get_vista_control_animal(db))
 
-        st.subheader("Vista Financiera (a1)")
+        st.subheader("Vista Financiera")
         st.write(a1)
 
-        st.subheader("Vista Conservacion (a2)")
+        st.subheader("Vista Conservacion")
         st.write(a2)
 
-        st.subheader("Vista Control Animal (a3)")
+        st.subheader("Vista Control Animal")
         st.write(a3)
 
     except Exception as e:
