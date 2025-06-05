@@ -11,9 +11,12 @@ from crud.crud import *
 
 import streamlit as st
 
-def app():
-    st.title("DataFrames de Animales, Eventos y Hábitats")
+st.set_page_config(layout="wide", page_title="Gestión de Zoológico - Vistas")
 
+
+def app():
+    st.title("Gestión de Zoológico - Vistas")
+    
     db = next(get_db())
     try:
         a1 = vista_financiera_to_dataframe(db, get_vista_financiera_mensual(db))
@@ -33,7 +36,7 @@ def app():
         st.error(f"Error durante la exportación de datos: {str(e)}")
         db.rollback()
     finally:
-        db.close() # Ensure the database connection is closed
+        db.close()
 
 if __name__ == "__main__":
     app()

@@ -1,13 +1,12 @@
 # app/streamlitview/home.py
 import sys
 import os
-
 # Añade el root del proyecto al path (sube 2 niveles desde este archivo)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
 import streamlit as st
 from database import get_db
-from models import Animal, Evento, Habitat, Especie, TipoHabitat # Make sure these models are correctly defined
+from models import Animal, Evento, Habitat, Especie, TipoHabitat
 from crud import crud
 from crud import crudvista
 from datetime import date, time
@@ -23,9 +22,9 @@ def get_all_tipos_habitat(db):
 
 # --- Streamlit App Structure ---
 
-st.set_page_config(layout="wide", page_title="Gestión de Zoológico - CRUD & Vistas")
+st.set_page_config(layout="wide", page_title="Gestión de Zoológico - CRUD")
 
-st.title("🐯 Gestión de Zoológico - CRUD & Vistas")
+st.title("Gestión de Zoológico - CRUD")
 
 # Sidebar for navigation
 st.sidebar.title("Navegación")

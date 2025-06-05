@@ -20,20 +20,20 @@ def app():
         a2 = eventos_to_dataframe(db, get_eventos(db))
         a3 = habitats_to_dataframe(db, get_habitats(db))
 
-        st.subheader("DataFrame de Animales (a1)")
+        st.subheader("DataFrame de Animales")
         st.write(a1)
 
-        st.subheader("DataFrame de Eventos (a2)")
+        st.subheader("DataFrame de Eventos")
         st.write(a2)
 
-        st.subheader("DataFrame de Hábitats (a3)")
+        st.subheader("DataFrame de Hábitats")
         st.write(a3)
 
     except Exception as e:
         st.error(f"Error durante la exportación de datos: {str(e)}")
         db.rollback()
     finally:
-        db.close() # Ensure the database connection is closed
+        db.close()
 
 if __name__ == "__main__":
     app()
