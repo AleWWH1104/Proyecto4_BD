@@ -251,7 +251,7 @@ try:
                 capacidad_maxima = st.number_input("Capacidad Máxima", min_value=1, value=5, key="habitat_cap_create")
                 area_metros_cuadrados = st.number_input("Área (m²)", min_value=0.0, format="%.2f", key="habitat_area_create")
                 fecha_construccion = st.date_input("Fecha de Construcción", value=date.today(), key="habitat_fcons_create")
-                estado = st.selectbox("Estado", ["activo", "inactivo", "mantenimiento"], key="habitat_estado_create")
+                estado = st.selectbox("Estado", ["activo", "mantenimiento", "cerrado"], key="habitat_estado_create")
                 costo_mantenimiento_mensual = st.number_input("Costo Mantenimiento Mensual", min_value=0.0, format="%.2f", key="habitat_costo_create")
 
                 submitted = st.form_submit_button("Crear Hábitat")
@@ -338,7 +338,7 @@ try:
                             new_capacidad_maxima = st.number_input("Nueva Capacidad Máxima", value=habitat_to_update.capacidad_maxima, min_value=1, key="habitat_cap_update")
                             new_area_metros_cuadrados = st.number_input("Nueva Área (m²)", value=float(habitat_to_update.area_metros_cuadrados), min_value=0.0, format="%.2f", key="habitat_area_update")
                             new_fecha_construccion = st.date_input("Nueva Fecha de Construcción", value=habitat_to_update.fecha_construccion, key="habitat_fcons_update")
-                            new_estado = st.selectbox("Nuevo Estado", ["activo", "inactivo", "mantenimiento"], index=["activo", "inactivo", "mantenimiento"].index(habitat_to_update.estado), key="habitat_estado_update")
+                            new_estado = st.selectbox("Nuevo Estado", ["activo", "mantenimiento", "cerrado"], index=["activo", "mantenimiento", "cerrado"].index(habitat_to_update.estado), key="habitat_estado_update")
                             new_costo_mantenimiento_mensual = st.number_input("Nuevo Costo Mantenimiento Mensual", value=float(habitat_to_update.costo_mantenimiento_mensual), min_value=0.0, format="%.2f", key="habitat_costo_update")
 
                             update_submitted = st.form_submit_button("Actualizar Hábitat")
@@ -408,12 +408,12 @@ try:
                 horario_fin = st.time_input("Horario de Fin", value=time(17, 0), key="evento_h_fin_create")
                 capacidad_maxima = st.number_input("Capacidad Máxima", min_value=1, value=100, key="evento_cap_create")
                 precio_entrada = st.number_input("Precio de Entrada", min_value=0.0, format="%.2f", key="evento_precio_create")
-                tipo_evento = st.text_input("Tipo de Evento", key="evento_tipo_create")
-                estado = st.selectbox("Estado", ["programado", "activo", "finalizado", "cancelado"], key="evento_estado_create")
+                tipo_evento = st.selectbox("Tipo", ["educativo", "entretenimiento", "especial", "temporal"], key="evento_tipo_create")
+                estado = st.selectbox("Estado", ["programado", "en_curso", "finalizado", "cancelado"], key="evento_estado_create")
                 
                 st.markdown("---")
                 st.write("**Horario Complejo (JSON)**")
-                st.info("Introduce un diccionario JSON válido. Ejemplo: `{'dias_semana': [1, 3], 'hora_inicio': '09:00:00', 'hora_fin': '12:00:00', 'duracion_minutos': 180, 'frecuencia': 'semanal'}`")
+                st.info("Introduce un diccionario JSON válido. Ejemplo: `{'dias_semana': [1], 'hora_inicio': '09:00:00', 'hora_fin': '12:00:00', 'duracion_minutos': 180, 'frecuencia': 'una_vez'}`")
                 horario_complejo_str = st.text_area("Horario Complejo (JSON)", value="{}", key="evento_horario_complejo_create")
 
                 submitted = st.form_submit_button("Crear Evento")
