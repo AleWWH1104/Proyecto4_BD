@@ -1,114 +1,126 @@
 # app/reports_tests.py
-from reports import reports
-from database import SessionLocal
-from models import VistaControlAnimal, VistaConservacion, VistaFinancieraMensual
-from datetime import date, timedelta
+from database import SessionLocal, get_db
+from reports.reports import (
+    get_reporte_animales_por_habitat,
+    get_reporte_eventos_y_asistencia,
+    get_reporte_alimentos_y_proveedores
+)
+from datetime import date, time
 
-def test_reporte_control_animal():
-    """Prueba el reporte de control animal con múltiples filtros"""
-    print("\n=== Probando Reporte de Control Animal ===")
-    db = SessionLocal()
-    reporte = reports.ReporteControlAnimal()
-    
-    # Filtros significativos
-    resultados = reporte.generar(
-        db,
-        especie="Panthera tigris",
-        estado_salud=["excelente"],
-        habitat="Jungla de Asia",
-        edad_min=2,
-        edad_max=10,
-        peso_min=50,
-        peso_max=200,
-        ultima_alimentacion_dias=3
-    )
-    
-    print(f"Encontrados {len(resultados)} animales que cumplen los criterios")
-    
-    # Exportar a CSV
-    fieldnames = [
-        'id_animal', 'nombre_animal', 'especie', 'estado_conservacion', 
-        'habitat', 'estado_salud', 'peso_actual', 'fecha_nacimiento',
-        'edad_aproximada', 'cuidador_principal', 'ultima_alimentacion_fecha'
-    ]
-    reports.export_to_csv(
-        [r.__dict__ for r in resultados],
-        fieldnames,
-        "reporte_control_animal.csv"
-    )
-    print("Reporte exportado a: reporte_control_animal.csv")
+def main():
+    print("Iniciando pruebas de reportes...")
 
-def test_reporte_conservacion():
-    """Prueba el reporte de estado de conservación"""
-    print("\n=== Probando Reporte de Conservación ===")
-    db = SessionLocal()
-    reporte = reports.ReporteConservacion()
-    
-    # Filtros significativos
-    resultados = reporte.generar(
-        db,
-        estado_conservacion=["vulnerable", "peligro"],
-        cantidad_min=1,
-        cantidad_max=10,
-        esperanza_vida_min=5,
-        esperanza_vida_max=30,
-        cuidadores_min=2,
-        veterinarios_min=1,
-        habitat="Selva"
-    )
-    
-    print(f"Encontradas {len(resultados)} especies que cumplen los criterios")
-    
-    # Exportar a CSV
-    fieldnames = [
-        'id_especie', 'nombre_cientifico', 'nombre_comun', 
-        'estado_conservacion', 'cantidad_en_zoo', 'habitat_principal',
-        'rango_temperatura', 'rango_humedad', 'cuidadores_asignados',
-        'veterinarios_especializados'
-    ]
-    reports.export_to_csv(
-        [r.__dict__ for r in resultados],
-        fieldnames,
-        "reporte_conservacion.csv"
-    )
-    print("Reporte exportado a: reporte_conservacion.csv")
+    db = next(get_db()) # Obtener una sesión de base de datos
 
-def test_reporte_financiero():
-    """Prueba el reporte financiero mensual"""
-    print("\n=== Probando Reporte Financiero ===")
-    db = SessionLocal()
-    reporte = reports.ReporteFinanciero()
-    
-    # Filtros significativos
-    resultados = reporte.generar(
-        db,
-        mes_inicio="2024-01",
-        mes_fin="2024-06",
-        ingresos_min=5000,
-        gastos_max=3000,
-        balance_min=1000,
-        ordenar_por="ingresos_totales",
-        orden_desc=True
-    )
-    
-    print(f"Encontrados {len(resultados)} meses que cumplen los criterios")
-    
-    # Exportar a CSV
-    fieldnames = [
-        'mes', 'ingresos_eventos', 'ingresos_ventas', 'costos_mantenimiento',
-        'gastos_tratamientos', 'costos_alimentos', 'costos_salarios',
-        'ingresos_totales', 'gastos_totales', 'balance_mensual'
-    ]
-    reports.export_to_csv(
-        [r.__dict__ for r in resultados],
-        fieldnames,
-        "reporte_financiero.csv"
-    )
-    print("Reporte exportado a: reporte_financiero.csv")
+    try:
+        print("\n--- Generando Reporte de Animales por Hábitat ---")
+        # Caso 1: Reporte general sin filtros
+        print("\n--- Reporte 1.1: Todos los animales en sus hábitats ---")
+        df_animales_all = get_reporte_animales_por_habitat(
+            db=db,
+            export_csv=True,
+            filename="reporte_animales_habitat_todos.csv"
+        )
+        print(f"Filas generadas: {len(df_animales_all)}")
+        if not df_animales_all.empty:
+            print(df_animales_all.head())
 
-# Ejecutar todas las pruebas
+        # Caso 2: Reporte filtrado de animales por hábitat
+        print("\n--- Reporte 1.2: Animales Macho con salud excelente en Bosque Tropical ---")
+        df_animales_filtrado = get_reporte_animales_por_habitat(
+            db=db,
+            nombre_habitat="Jungla de Asia",
+            tipo_habitat="Bosque Tropical",
+            estado_habitat="activo",
+            especie_nombre_comun="Tigre", # Buscar 'Tigre de Bengala'
+            sexo_animal="M",
+            estado_salud_animal="excelente",
+            min_peso=150.0,
+            max_peso=250.0,
+            export_csv=True,
+            filename="reporte_animales_habitat_filtrado.csv"
+        )
+        print(f"Filas generadas: {len(df_animales_filtrado)}")
+        if not df_animales_filtrado.empty:
+            print(df_animales_filtrado.head())
+        else:
+            print("No se encontraron animales con los filtros especificados para el reporte 1.2.")
+
+
+        print("\n--- Generando Reporte de Eventos y Asistencia ---")
+        # Caso 1: Reporte general de eventos
+        print("\n--- Reporte 2.1: Todos los eventos y su asistencia ---")
+        df_eventos_all = get_reporte_eventos_y_asistencia(
+            db=db,
+            export_csv=True,
+            filename="reporte_eventos_asistencia_todos.csv"
+        )
+        print(f"Filas generadas: {len(df_eventos_all)}")
+        if not df_eventos_all.empty:
+            print(df_eventos_all.head())
+
+        # Caso 2: Reporte filtrado de eventos con asistencia
+        print("\n--- Reporte 2.2: Eventos educativos programados con asistencia de adultos guatemaltecos ---")
+        df_eventos_filtrado = get_reporte_eventos_y_asistencia(
+            db=db,
+            fecha_inicio_desde=date(2025, 7, 1),
+            fecha_inicio_hasta=date(2025, 8, 31),
+            tipo_evento="educativo",
+            estado_evento="programado",
+            min_precio_entrada=0.0,
+            max_precio_entrada=10.0,
+            tipo_visitante="adulto",
+            nacionalidad_visitante="Guatemalteca",
+            evento_con_asistencia=True,
+            export_csv=True,
+            filename="reporte_eventos_asistencia_filtrado.csv"
+        )
+        print(f"Filas generadas: {len(df_eventos_filtrado)}")
+        if not df_eventos_filtrado.empty:
+            print(df_eventos_filtrado.head())
+        else:
+            print("No se encontraron eventos con los filtros especificados para el reporte 2.2.")
+
+
+        print("\n--- Generando Reporte de Alimentos y Proveedores ---")
+        # Caso 1: Reporte general de alimentos y proveedores
+        print("\n--- Reporte 3.1: Todos los alimentos y sus proveedores ---")
+        df_alimentos_all = get_reporte_alimentos_y_proveedores(
+            db=db,
+            export_csv=True,
+            filename="reporte_alimentos_proveedores_todos.csv"
+        )
+        print(f"Filas generadas: {len(df_alimentos_all)}")
+        if not df_alimentos_all.empty:
+            print(df_alimentos_all.head())
+
+        # Caso 2: Reporte filtrado de alimentos
+        print("\n--- Reporte 3.2: Alimentos carnívoros de ZooFood S.A. con calificación 5, stock > 100, y con fecha de vencimiento en o antes de 2025-07-15 o costo hasta 12.00 ---")
+        df_alimentos_filtrado = get_reporte_alimentos_y_proveedores(
+            db=db,
+            nombre_alimento="Carne",
+            tipo_alimento="carnivoro",
+            nombre_proveedor="ZooFood S.A.",
+            tipo_proveedor="alimentos",
+            calificacion_proveedor_min=5,
+            stock_actual_min=100,
+            fecha_vencimiento_antes=date(2025, 12, 31), # Esto debería incluir 'Carne de Res Magra' e 'Insectos Vivo'
+            costo_por_kg_max=12.00, # Esto debería incluir 'Insectos Vivo'
+            export_csv=True,
+            filename="reporte_alimentos_proveedores_filtrado.csv"
+        )
+        print(f"Filas generadas: {len(df_alimentos_filtrado)}")
+        if not df_alimentos_filtrado.empty:
+            print(df_alimentos_filtrado.head())
+        else:
+            print("No se encontraron alimentos con los filtros especificados para el reporte 3.2.")
+
+    except Exception as e:
+        print(f"Ocurrió un error durante las pruebas de reportes: {e}")
+        db.rollback()
+    finally:
+        db.close()
+        print("\nPruebas de reportes finalizadas.")
+
 if __name__ == "__main__":
-    test_reporte_control_animal()
-    test_reporte_conservacion()
-    test_reporte_financiero()
-    print("\n¡Todas las pruebas completadas exitosamente!")
+    main()

@@ -1,0 +1,6 @@
+nombre_evento,fecha_inicio,fecha_fin,horario_inicio,horario_fin,precio_entrada,tipo_evento,estado_evento,total_asistentes,ingresos_totales_evento
+Día de Concienciación del Elefante,2025-08-12,2025-08-12,09:00:00,17:00:00,0.00,especial,programado,1,0.00
+Taller de Arte Animal,2025-07-20,2025-07-20,10:00:00,12:00:00,10.00,entretenimiento,programado,1,10.00
+Charla Panda Gigante,2025-07-15,2025-07-15,11:00:00,11:45:00,6.00,educativo,programado,1,6.00
+Alimentación de Tigres,2025-07-01,2025-07-01,14:00:00,14:30:00,7.50,educativo,programado,1,7.50
+Noche de Safari Nocturno,2025-08-01,2025-08-01,20:00:00,22:00:00,25.00,especial,programado,1,25.00

@@ -145,6 +145,100 @@ class HorarioEventoType(TypeDecorator):
         return value
 # --- FIN NUEVO ---
 
+class InfoNutricionalType(TypeDecorator):
+    """
+    Tipo de dato personalizado para mapear el tipo compuesto 'info_nutricional' de PostgreSQL.
+    Lo almacenaremos como TEXT en la base de datos, serializando/deserializando a JSON.
+    """
+    impl = String # Usamos String porque PostgreSQL espera una representación de texto para el tipo compuesto
+
+    cache_ok = True
+
+    def process_bind_param(self, value, dialect):
+        """Convierte el objeto Python (diccionario) a una cadena para la DB."""
+        if value is not None:
+            if not isinstance(value, dict):
+                raise TypeError("InfoNutricional must be a dictionary with nutritional information.")
+            
+            calorias = value.get("calorias_por_100g")
+            proteinas = value.get("proteinas")
+            grasas = value.get("grasas")
+            carbohidratos = value.get("carbohidratos")
+            fibra = value.get("fibra")
+            vitaminas = value.get("vitaminas") # Esperamos una lista de strings
+
+            # Formatear los valores para la representación de cadena de PostgreSQL
+            calorias_str = str(int(calorias)) if calorias is not None else "NULL"
+            proteinas_str = f"{float(proteinas):.2f}" if proteinas is not None else "NULL"
+            grasas_str = f"{float(grasas):.2f}" if grasas is not None else "NULL"
+            carbohidratos_str = f"{float(carbohidratos):.2f}" if carbohidratos is not None else "NULL"
+            fibra_str = f"{float(fibra):.2f}" if fibra is not None else "NULL"
+            
+            # Para el array de TEXT[], PostgreSQL espera '{elemento1,elemento2}'
+            if vitaminas is not None and isinstance(vitaminas, list):
+                vitaminas_str = "{" + ",".join(f'"{v}"' for v in vitaminas) + "}"
+            else:
+                vitaminas_str = "NULL"
+
+            # Retorna la cadena en el formato de tipo compuesto de PostgreSQL: (v1,v2,v3,v4,v5,v6)
+            return f"({calorias_str},{proteinas_str},{grasas_str},{carbohidratos_str},{fibra_str},{vitaminas_str})"
+        return value
+
+    def process_result_value(self, value, dialect):
+        """Convierte la cadena de la DB a un objeto Python (diccionario)."""
+        if value is not None:
+            # Elimina los paréntesis exteriores
+            value = value.strip('()')
+            
+            # Divide la cadena, teniendo en cuenta el array de vitaminas
+            # Esto es un poco más complejo, ya que el array puede contener comas.
+            # Se puede usar una expresión regular para una división más robusta.
+            
+            # Para una solución simple que funcione si no hay comas dentro de los nombres de vitaminas:
+            # Asume que el array de vitaminas es el último elemento y está entre llaves.
+            
+            parts = []
+            if '{' in value and '}' in value:
+                # Encuentra el inicio y fin del array
+                start_array = value.find('{')
+                end_array = value.find('}')
+                
+                # Parte antes del array
+                pre_array_str = value[:start_array]
+                if pre_array_str:
+                    parts.extend(pre_array_str.rstrip(',').split(','))
+                
+                # Contenido del array
+                vitaminas_content = value[start_array + 1 : end_array]
+                parts.append(vitaminas_content) # Añade el contenido bruto del array
+                
+            else: # No hay array de vitaminas o está vacío
+                parts = value.split(',')
+            
+            # Asigna los valores a las variables
+            calorias = int(parts[0]) if parts[0] != "NULL" else None
+            proteinas = float(parts[1]) if parts[1] != "NULL" else None
+            grasas = float(parts[2]) if parts[2] != "NULL" else None
+            carbohidratos = float(parts[3]) if parts[3] != "NULL" else None
+            fibra = float(parts[4]) if parts[4] != "NULL" else None
+            
+            # Procesa el string de vitaminas de vuelta a una lista
+            vitaminas_str_raw = parts[5] if len(parts) > 5 else ""
+            vitaminas_list = []
+            if vitaminas_str_raw and vitaminas_str_raw != "NULL":
+                # Quita comillas y convierte a lista
+                vitaminas_list = [v.strip('"') for v in vitaminas_str_raw.split(',') if v.strip('"')]
+
+            return {
+                "calorias_por_100g": calorias,
+                "proteinas": proteinas,
+                "grasas": grasas,
+                "carbohidratos": carbohidratos,
+                "fibra": fibra,
+                "vitaminas": vitaminas_list
+            }
+        return value
+
 def get_db():
     """Obtener una sesion de base de datos"""
     db = SessionLocal()

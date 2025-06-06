@@ -1,0 +1,2 @@
+nombre_alimento,tipo_alimento,calorias_por_kg,costo_por_kg,fecha_vencimiento,stock_actual,stock_minimo,nombre_proveedor,contacto_principal,telefono,tipo_proveedor,calificacion,proveedor_activo
+Carne de Res Magra,carnivoro,1500,8.50,2025-07-15,500,100,ZooFood S.A.,Juan Pérez,12345678,alimentos,5,True
