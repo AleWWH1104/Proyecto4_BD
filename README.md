@@ -25,7 +25,7 @@
    venv\Scripts\activate
    ```
    > Si usas Linux/Mac, el comando es:  
-   > `source venv/bin/activate`
+   > `source venv/Scripts/activate`
 
 5. **Instala las dependencias**
    ```
