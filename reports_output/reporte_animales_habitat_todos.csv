@@ -1,0 +1,6 @@
+nombre_animal,numero_identificacion,sexo,peso_actual,estado_salud,especie_comun,nombre_cientifico,estado_conservacion,nombre_habitat,estado_habitat,tipo_habitat_nombre
+Raja,TGR-001,M,200.00,excelente,Tigre de Bengala,Panthera tigris,peligro,Jungla de Asia,activo,Bosque Tropical
+Mei,PND-002,F,105.00,bueno,Panda Gigante,Ailuropoda melanoleuca,vulnerable,Pico Rocoso,activo,Área Montañosa
+Zara,GRF-003,F,1100.00,excelente,Jirafa,Giraffa camelopardalis,casi_amenazado,Sabana Africana Ext.,activo,Pradera Abierta
+Jumbo,ELF-004,M,4200.00,regular,Elefante Africano,Loxodonta africana,vulnerable,Sabana Africana Ext.,activo,Pradera Abierta
+Arachna,TAR-005,F,0.03,bueno,Tarántula de Rodillas Rojas,Brachypelma hamorii,casi_amenazado,Dunas del Sahara,activo,Desierto

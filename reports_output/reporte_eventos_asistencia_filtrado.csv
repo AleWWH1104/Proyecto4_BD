@@ -1,0 +1,2 @@
+nombre_evento,fecha_inicio,fecha_fin,horario_inicio,horario_fin,precio_entrada,tipo_evento,estado_evento,nombre_visitante,apellido_visitante,tipo_visitante,nacionalidad,fecha_registro,precio_pagado,asistio
+Alimentación de Tigres,2025-07-01,2025-07-01,14:00:00,14:30:00,7.50,educativo,programado,Laura,Martínez,adulto,Guatemalteca,2025-05-20 10:00:00,7.50,True

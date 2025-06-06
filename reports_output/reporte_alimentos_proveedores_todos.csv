@@ -1,0 +1,6 @@
+nombre_alimento,tipo_alimento,calorias_por_kg,costo_por_kg,fecha_vencimiento,stock_actual,stock_minimo,nombre_proveedor,contacto_principal,telefono,tipo_proveedor,calificacion,proveedor_activo
+Carne de Res Magra,carnivoro,1500,8.50,2025-07-15,500,100,ZooFood S.A.,Juan Pérez,12345678,alimentos,5,True
+Bambú Fresco,herbivoro,150,2.00,2025-06-10,1000,200,NutriZoo Supplies,Pedro Sánchez,55511223,alimentos,5,True
+Pienso para Jirafas,herbivoro,2500,4.75,2025-12-31,750,150,ZooFood S.A.,Juan Pérez,12345678,alimentos,5,True
+Frutas y Verduras Mixtas,omnivoro,400,3.00,2025-06-07,300,50,NutriZoo Supplies,Pedro Sánchez,55511223,alimentos,5,True
+Insectos Vivo,carnivoro,1800,12.00,2025-06-05,200,30,ZooFood S.A.,Juan Pérez,12345678,alimentos,5,True
