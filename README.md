@@ -41,6 +41,7 @@
    ```
    streamlit run .\app\streamlitview\home.py
    ```
-
+   > Si usas Linux/Mac, el comando es:  
+   > `streamlit run ./app/streamlitview/home.py`
 ---
 
