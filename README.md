@@ -39,9 +39,9 @@
 
 7. **Ejecuta la aplicación Streamlit**
    ```
-   streamlit run .\app\streamlitview\home.py
+   streamlit run .\app\streamlitview\Inicio.py
    ```
    > Si usas Linux/Mac, el comando es:  
-   > `streamlit run ./app/streamlitview/home.py`
+   > `streamlit run ./app/streamlitview/Inicio.py`
 ---
 
