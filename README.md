@@ -25,7 +25,7 @@
    venv\Scripts\activate
    ```
    > Si usas Linux/Mac, el comando es:  
-   > `source venv/bin/activate`
+   > `source venv/Scripts/activate`
 
 5. **Instala las dependencias**
    ```
@@ -39,8 +39,9 @@
 
 7. **Ejecuta la aplicación Streamlit**
    ```
-   streamlit run .\app\streamlitview\home.py
+   streamlit run .\app\streamlitview\Inicio.py
    ```
-
+   > Si usas Linux/Mac, el comando es:  
+   > `streamlit run ./app/streamlitview/Inicio.py`
 ---
 
