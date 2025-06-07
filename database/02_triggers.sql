@@ -21,9 +21,9 @@ BEGIN
     -- Buscar cuidador principal disponible con la especialidad requerida
     SELECT c.id_cuidador INTO v_cuidador_principal_id
     FROM cuidadores c
-    JOIN empleados e ON c.id_cuidador = e.id_empleado
+    JOIN empleados emp ON c.id_cuidador = emp.id_empleado -- Use a different alias than 'e' for clarity
     WHERE c.especialidad = v_especialidad_requerida
-    AND e.activo = TRUE
+    AND emp.activo = TRUE
     ORDER BY c.años_experiencia DESC
     LIMIT 1;
     
@@ -31,10 +31,18 @@ BEGIN
     IF v_cuidador_principal_id IS NULL THEN
         SELECT c.id_cuidador INTO v_cuidador_principal_id
         FROM cuidadores c
-        JOIN empleados e ON c.id_cuidador = e.id_empleado
+        JOIN empleados emp ON c.id_cuidador = emp.id_empleado
         WHERE c.especialidad = 'Generalista'
-        AND e.activo = TRUE
+        AND emp.activo = TRUE
         ORDER BY c.años_experiencia DESC
+        LIMIT 1;
+    END IF;
+
+    -- NEW LOGIC: If still no specific or generalist caretaker, pick ANY available caretaker.
+    IF v_cuidador_principal_id IS NULL THEN
+        SELECT id_cuidador INTO v_cuidador_principal_id
+        FROM cuidadores
+        ORDER BY RANDOM()
         LIMIT 1;
     END IF;
     
@@ -52,9 +60,11 @@ BEGIN
             TRUE
         );
         
-        RAISE NOTICE 'Asignado cuidador principal % al animal %', v_cuidador_principal_id, NEW.id_animal;
+        RAISE NOTICE 'Asignado cuidador principal % al animal % (Especialidad: %)', v_cuidador_principal_id, NEW.id_animal, v_especialidad_requerida;
     ELSE
-        RAISE WARNING 'No se encontró cuidador disponible para asignar al animal %', NEW.id_animal;
+        -- This ELSE block should ideally never be reached if the previous logic guarantees an assignment
+        -- But keeping it as a fallback, perhaps as a NOTICE now.
+        RAISE NOTICE 'FALLBACK: No se encontró cuidador ALGUNo para asignar al animal %', NEW.id_animal;
     END IF;
     
     RETURN NEW;

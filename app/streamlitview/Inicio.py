@@ -10,7 +10,7 @@ st.markdown("---")
 
 st.header("Sobre el Proyecto")
 st.write(
-    "Este proyecto es una implementación del **Proyecto 4 - Bases de Datos**, que consiste en diseñar y desarrollar un **sistema de gestión universitaria integral utilizando un ORM (Object-Relational Mapper)**. "
+    "Este proyecto es una implementación del **Proyecto 4 - Bases de Datos**, que consiste en diseñar y desarrollar un **Sistema utilizando un ORM (Object-Relational Mapper)**. "
     "El sistema incluye diversos módulos, estructurados con **más de 20 tablas normalizadas**, lo que garantiza la eficiencia y la integridad de los datos. "
     "Además, incorpora **validaciones complejas** para asegurar la calidad de la información y ofrece **funcionalidades de reportes** que permiten un análisis profundo de los datos."
 )
