@@ -184,3 +184,127 @@ INSERT INTO horarios (dia_semana, hora_inicio, hora_fin, tipo_actividad, descrip
 ('miercoles', '14:00:00', '14:30:00', 'Alimentación Pública', 'Evento de alimentación de Tigres.', NULL, (SELECT id_evento FROM eventos WHERE nombre = 'Alimentación de Tigres')),
 ('jueves', '10:00:00', '16:00:00', 'Mantenimiento de Infraestructura', 'Tareas de mantenimiento en áreas comunes.', (SELECT id_empleado FROM empleados WHERE email = 'luis.s@zoo.com'), NULL),
 ('viernes', '11:00:00', '11:45:00', 'Charla Educativa', 'Charla sobre la conservación del Panda.', NULL, (SELECT id_evento FROM eventos WHERE nombre = 'Charla Panda Gigante'));
+
+
+-- ================================================================
+-- 5. Generación masiva de datos para alcanzar +500 registros
+--    (Para tablas con alta frecuencia de inserción o interrelaciones)
+-- ================================================================
+
+-- 5.1. Generación de 100 visitantes adicionales
+--    Se generarán emails únicos con un UUID, y nacionalidades y tipos aleatorios
+INSERT INTO visitantes (nombre, apellido, email, telefono, fecha_nacimiento, nacionalidad, tipo_visitante)
+SELECT
+    'Visitante' || (ROW_NUMBER() OVER () + 5) AS nombre, -- Empieza desde el 6to visitante
+    'Apellido' || (ROW_NUMBER() OVER () + 5) AS apellido,
+    'visitor' || REPLACE(GEN_RANDOM_UUID()::TEXT, '-', '') || '@example.com' AS email,
+    '502' || LPAD((FLOOR(RANDOM() * 99999999))::TEXT, 8, '0') AS telefono,
+    (CURRENT_DATE - (FLOOR(RANDOM() * 365 * 50) + 365 * 10 || ' days')::INTERVAL)::DATE AS fecha_nacimiento,
+    CASE FLOOR(RANDOM() * 5)
+        WHEN 0 THEN 'Guatemalteca'
+        WHEN 1 THEN 'Mexicana'
+        WHEN 2 THEN 'Salvadoreña'
+        WHEN 3 THEN 'Hondureña'
+        ELSE 'Costarricense'
+    END AS nacionalidad,
+    (CASE FLOOR(RANDOM() * 4) -- ¡CORRECCIÓN AQUÍ!
+        WHEN 0 THEN 'adulto'
+        WHEN 1 THEN 'niño'
+        WHEN 2 THEN 'estudiante'
+        ELSE 'adulto_mayor'
+    END)::tipo_visitante_enum AS tipo_visitante -- <<--- CAST explícito
+FROM GENERATE_SERIES(1, 100);
+
+-- 5.2. Generación masiva de Registros de Alimentación Animal (alrededor de 200 registros)
+--    Combinando animales existentes, alimentos y cuidadores
+INSERT INTO animal_alimentacion (id_animal, id_alimento, id_cuidador, fecha_alimentacion, hora_alimentacion, cantidad_kg, observaciones)
+SELECT
+    a.id_animal,
+    al.id_alimento,
+    c.id_cuidador,
+    (CURRENT_DATE - (FLOOR(RANDOM() * 365) || ' days')::INTERVAL)::DATE AS fecha_alimentacion,
+    (TIME '08:00:00' + (FLOOR(RANDOM() * 10) * INTERVAL '1 hour'))::TIME AS hora_alimentacion,
+    (RANDOM() * 10 + 0.1)::DECIMAL(8,2) AS cantidad_kg, -- Cantidad entre 0.1 y 10.1 kg
+    CASE FLOOR(RANDOM() * 3)
+        WHEN 0 THEN 'Comió con apetito.'
+        WHEN 1 THEN 'Alimentación estándar.'
+        ELSE 'Observado consumiendo la ración completa.'
+    END AS observaciones
+FROM
+    animales a,
+    alimentos al,
+    cuidadores c
+ORDER BY RANDOM()
+LIMIT 200;
+
+-- 5.3. Generación masiva de Asistencias a Eventos (alrededor de 200 registros)
+--    Combinando visitantes y eventos existentes
+INSERT INTO visitante_evento (id_visitante, id_evento, fecha_registro, precio_pagado, asistio, calificacion, comentarios)
+SELECT
+    v.id_visitante,
+    e.id_evento,
+    (CURRENT_TIMESTAMP - (FLOOR(RANDOM() * 300) || ' days')::INTERVAL - (FLOOR(RANDOM() * 24) || ' hours')::INTERVAL - (FLOOR(RANDOM() * 60) || ' minutes')::INTERVAL)::TIMESTAMP AS fecha_registro,
+    e.precio_entrada * (1 - (FLOOR(RANDOM() * 2) * 0.1))::DECIMAL(8,2) AS precio_pagado, -- Descuento del 0% o 10%
+    CASE WHEN RANDOM() < 0.9 THEN TRUE ELSE FALSE END AS asistio, -- 90% de probabilidad de asistir
+    (FLOOR(RANDOM() * 5) + 1)::INTEGER AS calificacion, -- Calificación del 1 al 5
+    CASE FLOOR(RANDOM() * 4)
+        WHEN 0 THEN 'Evento muy bueno, lo recomendaría.'
+        WHEN 1 THEN 'Experiencia agradable y educativa.'
+        WHEN 2 THEN 'Faltó algo de interacción, pero bien.'
+        WHEN 3 THEN 'Buena organización.'
+        ELSE 'Sin comentarios.'
+    END AS comentarios
+FROM
+    visitantes v,
+    eventos e
+WHERE
+    e.fecha_inicio <= CURRENT_DATE + INTERVAL '30 days' -- Solo eventos pasados o próximos 30 días
+ORDER BY RANDOM()
+LIMIT 200
+ON CONFLICT (id_visitante, id_evento) DO NOTHING; -- <--- ¡Añadido aquí!
+
+-- 5.4. Generación masiva de Mantenimientos de Hábitats (alrededor de 50 registros)
+--    Combinando hábitats y empleados existentes
+INSERT INTO habitat_mantenimiento (id_habitat, id_empleado, fecha_mantenimiento, tipo_mantenimiento, descripcion_trabajo, costo, tiempo_horas, completado)
+SELECT
+    h.id_habitat,
+    e.id_empleado,
+    (CURRENT_DATE - (FLOOR(RANDOM() * 180) || ' days')::INTERVAL)::DATE AS fecha_mantenimiento,
+    (CASE FLOOR(RANDOM() * 4) -- ¡CORRECCIÓN AQUÍ!
+        WHEN 0 THEN 'limpieza'
+        WHEN 1 THEN 'reparacion'
+        WHEN 2 THEN 'inspeccion'
+        ELSE 'mejora'
+    END)::tipo_mantenimiento_enum AS tipo_mantenimiento, -- <<--- CAST explícito (Asumo que tienes un ENUM para esto)
+    'Trabajo de mantenimiento rutinario en ' || h.nombre AS descripcion_trabajo,
+    (RANDOM() * 500 + 50)::DECIMAL(10,2) AS costo,
+    (RANDOM() * 16 + 1)::DECIMAL(5,2) AS tiempo_horas,
+    CASE WHEN RANDOM() < 0.95 THEN TRUE ELSE FALSE END AS completado -- 95% de probabilidad de completado
+FROM
+    habitats h,
+    empleados e
+WHERE
+    e.tipo_empleado IN ('operativo', 'especialista') -- Empleados relevantes para mantenimiento
+ORDER BY RANDOM()
+LIMIT 50;
+
+-- 5.5. Generación masiva de Ventas de Productos (alrededor de 50 registros)
+--    Combinando visitantes y productos existentes
+INSERT INTO venta_productos (id_visitante, id_producto, cantidad, precio_unitario, fecha_venta, metodo_pago, descuento_aplicado)
+SELECT
+    v.id_visitante,
+    p.id_producto,
+    (FLOOR(RANDOM() * 3) + 1)::INTEGER AS cantidad, -- Cantidad entre 1 y 3
+    p.precio AS precio_unitario,
+    (CURRENT_TIMESTAMP - (FLOOR(RANDOM() * 300) || ' days')::INTERVAL - (FLOOR(RANDOM() * 24) || ' hours')::INTERVAL)::TIMESTAMP AS fecha_venta,
+    (CASE FLOOR(RANDOM() * 3) -- ¡CORRECCIÓN AQUÍ!
+        WHEN 0 THEN 'tarjeta'
+        WHEN 1 THEN 'efectivo'
+        ELSE 'transferencia'
+    END)::metodo_pago_enum AS metodo_pago, -- <<--- CAST explícito (Asumo que tienes un ENUM para esto)
+    (FLOOR(RANDOM() * 2) * 0.05)::DECIMAL(8,2) AS descuento_aplicado -- 0% o 5% de descuento
+FROM
+    visitantes v,
+    productos p
+ORDER BY RANDOM()
+LIMIT 50;
