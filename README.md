@@ -1,4 +1,23 @@
-﻿# Proyecto4_BD
+# Peluzoo - Sistema de Gestión para Zoológicos
+
+
+
+## Descripción 📝
+
+Sistema completo para administrar todos los aspectos de un zoológico moderno:
+
+- 🐘 Gestión de animales y hábitats
+- 📅 Eventos y visitantes
+- 💰 Control financiero
+- 📊 Reportes avanzados
+
+## Requisitos 📋
+![Docker](https://img.shields.io/badge/Docker-✓-blue?logo=docker)
+![Python](https://img.shields.io/badge/Python-3.13+-green?logo=python)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13+-blue?logo=postgresql)
+- Docker 🐳
+- Python 3.13+ 🐍
+- pip 📦
 
 ## Pasos para iniciar el proyecto
 
@@ -43,5 +62,35 @@
    ```
    > Si usas Linux/Mac, el comando es:  
    > `streamlit run ./app/streamlitview/Inicio.py`
+
+**Abre la aplicación en tu navegador:** http://localhost:8501 después de iniciar Streamlit (Si es otro puerto abrir en ese)
+---
+
+
+## Uso 🖥️
+
+Accede a los módulos principales desde el menú lateral:
+
+- 🏠 **Inicio**: Dashboard resumen
+- 🐾 **Animales**: Registro y seguimiento
+- 🌿 **Hábitats**: Gestión de espacios
+- 🎪 **Eventos**: Programación y asistencia
+- 📈 **Reportes**: Generación de análisis
+- 📊 **Vistas**: Consultas predefinidas
+
+## Características Clave ✨
+
+✅ Automatización de cuidados animales  
+✅ Control de capacidad de hábitats  
+✅ Exportación a CSV
+
+## Equipo 👥
+
+- Iris Ayala
+- Gabriel Bran
+- David Dominguez
+- Jonathan Díaz
+- Anggie Quezada
+
 ---
 
